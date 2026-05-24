@@ -1,14 +1,12 @@
-// Server component — exports generateStaticParams for static export.
-// All actual rendering is delegated to the client component below,
-// which reads idea data from localStorage at runtime.
+import IdeaDetailClient from "./IdeaDetailClient";
+
+// Required for Next.js static export.
+// Ideas are created at runtime (localStorage), so no IDs are known at build
+// time. Returning [] builds the page shell once; client-side routing handles
+// the actual data lookup.
 export function generateStaticParams() {
-  // Ideas are created at runtime (stored in localStorage), so we cannot
-  // enumerate IDs at build time. Returning [] tells Next.js to build the
-  // page shell once; client-side routing then fills in the data.
   return [];
 }
-
-import IdeaDetailClient from "./IdeaDetailClient";
 
 export default function IdeaDetailPage() {
   return <IdeaDetailClient />;
