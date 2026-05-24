@@ -1,11 +1,12 @@
 import IdeaDetailClient from "./IdeaDetailClient";
 
-// Required for Next.js static export.
-// Ideas are created at runtime (localStorage), so no IDs are known at build
-// time. Returning [] builds the page shell once; client-side routing handles
-// the actual data lookup.
+// Static export requires at least one entry from generateStaticParams.
+// We return a single placeholder so Next.js includes the page JS bundle.
+// All real idea IDs (stored in localStorage) are resolved client-side at
+// runtime — navigating via a Link works perfectly; only hard-refreshing a
+// direct /idea/<id> URL hits GitHub Pages' 404 (expected static-hosting limit).
 export function generateStaticParams() {
-  return [];
+  return [{ id: "_" }];
 }
 
 export default function IdeaDetailPage() {
