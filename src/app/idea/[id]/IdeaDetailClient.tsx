@@ -1,7 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { useData } from "@/hooks/useData";
-import { ThumbsUp, ThumbsDown, CheckCircle2, ArrowLeft, CalendarDays, Banknote, User } from "lucide-react";
+import { useAdmin } from "@/hooks/useAdmin";
+import { AdminSolveModal } from "@/components/AdminSolveModal";
+import {
+  ThumbsUp, ThumbsDown, CheckCircle2, ArrowLeft,
+  CalendarDays, Banknote, User, ShieldCheck,
+} from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -16,7 +22,9 @@ const CATEGORY_COLORS: Record<string, string> = {
 export default function IdeaDetailClient() {
   const params = useParams();
   const id = params.id as string;
-  const { ideas, voteIdea, isLoaded } = useData();
+  const { ideas, voteIdea, solveIdea, userVotes, isLoaded } = useData();
+  const { isAdmin } = useAdmin();
+  const [solveOpen, setSolveOpen] = useState(false);
 
   if (!isLoaded) {
     return (
@@ -33,10 +41,7 @@ export default function IdeaDetailClient() {
       <div className="max-w-3xl mx-auto py-16 text-center">
         <p className="text-5xl mb-4">🔍</p>
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Idea not found</h1>
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-green-600 hover:text-green-700 font-medium"
-        >
+        <Link href="/" className="inline-flex items-center gap-2 text-green-600 hover:text-green-700 font-medium">
           <ArrowLeft className="w-4 h-4" />
           Back to all ideas
         </Link>
@@ -45,6 +50,7 @@ export default function IdeaDetailClient() {
   }
 
   const badgeClass = CATEGORY_COLORS[idea.category] ?? "bg-gray-100 text-gray-700";
+  const userVote = userVotes[idea.id] ?? 0;
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -61,13 +67,13 @@ export default function IdeaDetailClient() {
 
       <div className="bg-white rounded-2xl shadow-sm border border-green-100 overflow-hidden">
         {/* Header stripe */}
-        <div className="bg-gradient-to-r from-green-700 to-green-500 h-2" />
+        <div className={`h-2 ${idea.solved ? "bg-gradient-to-r from-green-700 to-green-400" : "bg-gradient-to-r from-green-700 to-green-500"}`} />
 
         <div className="p-6 sm:p-8">
           <div className="flex items-start gap-4 sm:gap-6">
             {/* Main content */}
             <div className="flex-1 min-w-0">
-              {/* Badges */}
+              {/* Badges + admin button */}
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${badgeClass}`}>
                   {idea.category}
@@ -77,6 +83,15 @@ export default function IdeaDetailClient() {
                     <CheckCircle2 className="w-4 h-4" />
                     Solved
                   </span>
+                )}
+                {isAdmin && !idea.solved && (
+                  <button
+                    onClick={() => setSolveOpen(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold bg-amber-100 text-amber-800 hover:bg-amber-200 transition-colors"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    Mark as Solved
+                  </button>
                 )}
               </div>
 
@@ -104,7 +119,7 @@ export default function IdeaDetailClient() {
                   <div className="flex items-center gap-2 text-sm">
                     <Banknote className="w-4 h-4 text-green-600" />
                     <span className="text-gray-500">Estimated:</span>
-                    <span className="font-semibold text-green-700">{idea.costs}</span>
+                    <span className="font-semibold text-green-700">{idea.costs} EUR</span>
                   </div>
                 )}
               </div>
@@ -118,13 +133,41 @@ export default function IdeaDetailClient() {
                   {idea.subtitle}
                 </p>
               </div>
+
+              {/* Solution section */}
+              {idea.solved && (idea.solutionText || idea.solutionImageUrl) && (
+                <div className="mt-8 p-5 bg-green-50 rounded-xl border border-green-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <CheckCircle2 className="w-5 h-5 text-green-600" />
+                    <h2 className="text-base font-bold text-green-800 uppercase tracking-wider">
+                      Solution
+                    </h2>
+                  </div>
+                  {idea.solutionText && (
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap mb-4">
+                      {idea.solutionText}
+                    </p>
+                  )}
+                  {idea.solutionImageUrl && (
+                    <img
+                      src={idea.solutionImageUrl}
+                      alt="Solution"
+                      className="rounded-xl w-full max-h-80 object-cover border border-green-100"
+                    />
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Vote widget */}
             <div className="flex flex-col items-center bg-green-50 border border-green-200 rounded-2xl px-3 py-4 sm:px-4 min-w-[4.5rem] flex-shrink-0">
               <button
                 onClick={() => voteIdea(idea.id, 1)}
-                className="p-2 rounded-xl text-gray-400 hover:text-green-600 hover:bg-green-100 transition-colors touch-manipulation"
+                className={`p-2 rounded-xl transition-colors touch-manipulation ${
+                  userVote === 1
+                    ? "text-green-600 bg-green-100"
+                    : "text-gray-400 hover:text-green-600 hover:bg-green-100"
+                }`}
                 aria-label="Upvote"
               >
                 <ThumbsUp className="w-6 h-6 sm:w-7 sm:h-7" />
@@ -134,7 +177,11 @@ export default function IdeaDetailClient() {
               </span>
               <button
                 onClick={() => voteIdea(idea.id, -1)}
-                className="p-2 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors touch-manipulation"
+                className={`p-2 rounded-xl transition-colors touch-manipulation ${
+                  userVote === -1
+                    ? "text-red-500 bg-red-50"
+                    : "text-gray-400 hover:text-red-500 hover:bg-red-50"
+                }`}
                 aria-label="Downvote"
               >
                 <ThumbsDown className="w-6 h-6 sm:w-7 sm:h-7" />
@@ -144,6 +191,18 @@ export default function IdeaDetailClient() {
           </div>
         </div>
       </div>
+
+      {/* Admin solve modal */}
+      {solveOpen && (
+        <AdminSolveModal
+          ideaTitle={idea.title}
+          onConfirm={async (text, file) => {
+            await solveIdea(idea.id, text, file);
+            setSolveOpen(false);
+          }}
+          onCancel={() => setSolveOpen(false)}
+        />
+      )}
     </div>
   );
 }

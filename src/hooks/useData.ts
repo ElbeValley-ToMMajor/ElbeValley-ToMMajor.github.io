@@ -6,13 +6,15 @@ import {
   onSnapshot,
   addDoc,
   doc,
+  updateDoc,
   runTransaction,
   deleteField,
   increment,
   orderBy,
   query,
 } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, storage } from "@/lib/firebase";
 import { getUserId } from "@/hooks/useUser";
 import { Idea } from "../types";
 
@@ -41,6 +43,8 @@ export function useData() {
           rating: raw.rating,
           solved: raw.solved,
           createdAt: raw.createdAt,
+          solutionText: raw.solutionText,
+          solutionImageUrl: raw.solutionImageUrl,
         });
         const v = raw.votes?.[userId];
         if (v === 1 || v === -1) votes[docSnap.id] = v;
@@ -99,5 +103,21 @@ export function useData() {
     });
   };
 
-  return { ideas, addIdea, voteIdea, userVotes, isLoaded };
+  const solveIdea = async (id: string, solutionText: string, imageFile?: File) => {
+    let solutionImageUrl: string | undefined;
+
+    if (imageFile) {
+      const storageRef = ref(storage, `solutions/${id}/${imageFile.name}`);
+      await uploadBytes(storageRef, imageFile);
+      solutionImageUrl = await getDownloadURL(storageRef);
+    }
+
+    await updateDoc(doc(db, "ideas", id), {
+      solved: true,
+      solutionText,
+      ...(solutionImageUrl ? { solutionImageUrl } : {}),
+    });
+  };
+
+  return { ideas, addIdea, voteIdea, solveIdea, userVotes, isLoaded };
 }

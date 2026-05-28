@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Idea } from "@/types";
 import { X } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
@@ -19,8 +19,20 @@ export function IdeaForm({ onSubmit, onCancel }: IdeaFormProps) {
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [creator, setCreator] = useState(username);
+
+  // Sync creator once username loads from localStorage
+  useEffect(() => {
+    if (username && !creator) setCreator(username);
+  }, [username]);
   const [category, setCategory] = useState("Community");
   const [costs, setCosts] = useState("");
+
+  const handleCostsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\./g, "").replace(/\D/g, "");
+    if (raw === "") { setCosts(""); return; }
+    const num = parseInt(raw, 10);
+    if (!isNaN(num)) setCosts(num.toLocaleString("de-DE"));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,9 +120,10 @@ export function IdeaForm({ onSubmit, onCancel }: IdeaFormProps) {
                 type="text"
                 id="costs"
                 value={costs}
-                onChange={(e) => setCosts(e.target.value)}
+                onChange={handleCostsChange}
                 className={inputClass}
-                placeholder="e.g., 5,000 EUR"
+                placeholder="z.B. 5.000"
+                inputMode="numeric"
               />
             </div>
           </div>

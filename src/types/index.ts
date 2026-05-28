@@ -17,4 +17,6 @@ export interface Idea {
   rating: number;
   solved: boolean;
   createdAt: number;
+  solutionText?: string;
+  solutionImageUrl?: string;
 }
