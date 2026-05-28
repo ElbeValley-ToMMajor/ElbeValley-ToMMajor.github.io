@@ -12,7 +12,7 @@ const inputClass =
 const labelClass = "block text-sm font-semibold text-gray-700";
 
 export default function WishesPage() {
-  const { wishes, addWish, voteWish, isLoaded } = useWishes();
+  const { wishes, addWish, voteWish, userVotes, isLoaded } = useWishes();
   const { username } = useUser();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -92,7 +92,7 @@ export default function WishesPage() {
           </div>
         ) : (
           sorted.map((wish, index) => (
-            <WishCard key={wish.id} wish={wish} onVote={voteWish} rank={index + 1} />
+            <WishCard key={wish.id} wish={wish} onVote={voteWish} userVote={userVotes[wish.id] ?? 0} rank={index + 1} />
           ))
         )}
       </div>

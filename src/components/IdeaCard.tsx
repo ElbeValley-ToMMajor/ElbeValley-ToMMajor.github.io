@@ -6,7 +6,8 @@ import Link from "next/link";
 
 interface IdeaCardProps {
   idea: Idea;
-  onVote: (id: string, increment: number) => void;
+  onVote: (id: string, direction: 1 | -1) => void;
+  userVote?: 1 | -1 | 0;
   rank: number;
 }
 
@@ -30,7 +31,7 @@ function categoryBadge(category: string) {
   return CATEGORY_COLORS[category] ?? "bg-gray-100 text-gray-700";
 }
 
-export function IdeaCard({ idea, onVote, rank }: IdeaCardProps) {
+export function IdeaCard({ idea, onVote, userVote = 0, rank }: IdeaCardProps) {
   const rankColor =
     rank === 1 ? "text-yellow-500 border-yellow-400 bg-yellow-50" :
     rank === 2 ? "text-gray-400 border-gray-300 bg-gray-50" :
@@ -95,7 +96,11 @@ export function IdeaCard({ idea, onVote, rank }: IdeaCardProps) {
               e.stopPropagation();
               onVote(idea.id, 1);
             }}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-100 transition-colors touch-manipulation"
+            className={`p-1.5 rounded-lg transition-colors touch-manipulation ${
+              userVote === 1
+                ? "text-green-600 bg-green-100"
+                : "text-gray-400 hover:text-green-600 hover:bg-green-100"
+            }`}
             aria-label="Upvote"
           >
             <ThumbsUp className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -109,7 +114,11 @@ export function IdeaCard({ idea, onVote, rank }: IdeaCardProps) {
               e.stopPropagation();
               onVote(idea.id, -1);
             }}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors touch-manipulation"
+            className={`p-1.5 rounded-lg transition-colors touch-manipulation ${
+              userVote === -1
+                ? "text-red-500 bg-red-50"
+                : "text-gray-400 hover:text-red-500 hover:bg-red-50"
+            }`}
             aria-label="Downvote"
           >
             <ThumbsDown className="w-4 h-4 sm:w-5 sm:h-5" />

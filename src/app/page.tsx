@@ -9,7 +9,7 @@ import { Plus, LayoutGrid, Trophy, CheckCircle2, Tag, Lightbulb } from "lucide-r
 import Link from "next/link";
 
 export default function IdeaFindingPage() {
-  const { ideas, addIdea, voteIdea, isLoaded } = useData();
+  const { ideas, addIdea, voteIdea, userVotes, isLoaded } = useData();
   const [activeFilter, setActiveFilter] = useState("all");
   const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -135,7 +135,7 @@ export default function IdeaFindingPage() {
             </div>
           ) : (
             filteredIdeas.map((idea, index) => (
-              <IdeaCard key={idea.id} idea={idea} onVote={voteIdea} rank={index + 1} />
+              <IdeaCard key={idea.id} idea={idea} onVote={voteIdea} userVote={userVotes[idea.id] ?? 0} rank={index + 1} />
             ))
           )}
         </div>

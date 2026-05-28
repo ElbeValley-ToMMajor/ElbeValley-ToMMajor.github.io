@@ -5,7 +5,8 @@ import { ThumbsUp, ThumbsDown, CalendarDays } from "lucide-react";
 
 interface WishCardProps {
   wish: FeatureWish;
-  onVote: (id: string, increment: number) => void;
+  onVote: (id: string, direction: 1 | -1) => void;
+  userVote?: 1 | -1 | 0;
   rank: number;
 }
 
@@ -17,7 +18,7 @@ function formatDate(ts: number) {
   });
 }
 
-export function WishCard({ wish, onVote, rank }: WishCardProps) {
+export function WishCard({ wish, onVote, userVote = 0, rank }: WishCardProps) {
   const rankColor =
     rank === 1 ? "text-yellow-500 border-yellow-400 bg-yellow-50" :
     rank === 2 ? "text-gray-400 border-gray-300 bg-gray-50" :
@@ -52,7 +53,11 @@ export function WishCard({ wish, onVote, rank }: WishCardProps) {
       <div className="flex flex-col items-center flex-shrink-0 bg-green-50 border border-green-200 rounded-xl px-2 py-2 sm:px-3 min-w-[3rem] sm:min-w-[3.5rem]">
         <button
           onClick={() => onVote(wish.id, 1)}
-          className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-100 transition-colors touch-manipulation"
+          className={`p-1.5 rounded-lg transition-colors touch-manipulation ${
+            userVote === 1
+              ? "text-green-600 bg-green-100"
+              : "text-gray-400 hover:text-green-600 hover:bg-green-100"
+          }`}
           aria-label="Upvote"
         >
           <ThumbsUp className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -62,7 +67,11 @@ export function WishCard({ wish, onVote, rank }: WishCardProps) {
         </span>
         <button
           onClick={() => onVote(wish.id, -1)}
-          className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors touch-manipulation"
+          className={`p-1.5 rounded-lg transition-colors touch-manipulation ${
+            userVote === -1
+              ? "text-red-500 bg-red-50"
+              : "text-gray-400 hover:text-red-500 hover:bg-red-50"
+          }`}
           aria-label="Downvote"
         >
           <ThumbsDown className="w-4 h-4 sm:w-5 sm:h-5" />
