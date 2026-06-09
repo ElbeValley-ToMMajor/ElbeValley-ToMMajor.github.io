@@ -3,6 +3,7 @@
 import { Idea } from "@/types";
 import { ThumbsUp, ThumbsDown, CheckCircle2, CalendarDays, Banknote } from "lucide-react";
 import Link from "next/link";
+import { formatCosts } from "@/lib/formatCosts";
 
 interface IdeaCardProps {
   idea: Idea;
@@ -82,7 +83,7 @@ export function IdeaCard({ idea, onVote, userVote = 0, rank }: IdeaCardProps) {
             {idea.costs && (
               <span className="flex items-center gap-1 text-green-700 font-medium">
                 <Banknote className="w-3.5 h-3.5" />
-                {idea.costs}
+                {formatCosts(idea.costs)}
               </span>
             )}
           </div>

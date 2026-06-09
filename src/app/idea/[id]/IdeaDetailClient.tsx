@@ -8,6 +8,7 @@ import {
   ThumbsUp, ThumbsDown, CheckCircle2, ArrowLeft,
   CalendarDays, Banknote, User, ShieldCheck,
 } from "lucide-react";
+import { formatCosts } from "@/lib/formatCosts";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -119,7 +120,7 @@ export default function IdeaDetailClient() {
                   <div className="flex items-center gap-2 text-sm">
                     <Banknote className="w-4 h-4 text-green-600" />
                     <span className="text-gray-500">Estimated:</span>
-                    <span className="font-semibold text-green-700">{idea.costs} EUR</span>
+                    <span className="font-semibold text-green-700">{formatCosts(idea.costs!)}</span>
                   </div>
                 )}
               </div>
