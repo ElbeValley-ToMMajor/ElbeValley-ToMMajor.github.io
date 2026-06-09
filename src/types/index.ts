@@ -5,6 +5,8 @@ export interface FeatureWish {
   creator: string;
   rating: number;
   createdAt: number;
+  solved?: boolean;
+  solutionText?: string;
 }
 
 export interface Idea {
@@ -17,6 +19,8 @@ export interface Idea {
   rating: number;
   solved: boolean;
   inProgress?: boolean;
+  progressPercent?: number;
+  progressNote?: string;
   createdAt: number;
   solutionText?: string;
   solutionImageUrl?: string;

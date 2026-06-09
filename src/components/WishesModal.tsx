@@ -5,7 +5,7 @@ import { useWishes } from "@/hooks/useWishes";
 import { useUser } from "@/hooks/useUser";
 import { useToast } from "@/context/ToastContext";
 import { WishCard } from "@/components/WishCard";
-import { X, Plus, Lightbulb, Check } from "lucide-react";
+import { X, Plus, Lightbulb, Check, CheckCircle2 } from "lucide-react";
 
 const inputClass =
   "mt-1 block w-full rounded-lg border border-gray-200 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-500/20 sm:text-sm p-2.5 bg-white outline-none transition-all";
@@ -16,31 +16,37 @@ interface WishesModalProps {
 }
 
 export function WishesModal({ onClose }: WishesModalProps) {
-  const { wishes, addWish, voteWish, userVotes, isLoaded } = useWishes();
+  const { wishes, addWish, voteWish, solveWish, userVotes, isLoaded } = useWishes();
   const { username } = useUser();
   const { toast } = useToast();
 
+  const [tab, setTab] = useState<"open" | "solved">("open");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [creator, setCreator] = useState(username);
 
-  const sorted = useMemo(() => [...wishes].sort((a, b) => b.rating - a.rating), [wishes]);
+  const openWishes   = useMemo(() => wishes.filter((w) => !w.solved).sort((a, b) => b.rating - a.rating), [wishes]);
+  const solvedWishes = useMemo(() => wishes.filter((w) =>  w.solved).sort((a, b) => b.rating - a.rating), [wishes]);
+  const displayed    = tab === "open" ? openWishes : solvedWishes;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !description || !creator) return;
     addWish({ title, description, creator });
     toast("Feature wish submitted!", "success");
-    setTitle("");
-    setDescription("");
-    setCreator(username);
+    setTitle(""); setDescription(""); setCreator(username);
     setIsFormOpen(false);
   };
 
   const handleVote = (id: string, dir: 1 | -1) => {
     voteWish(id, dir);
     toast(dir === 1 ? "Upvote saved!" : "Downvote saved!", "success");
+  };
+
+  const handleSolve = async (id: string, solutionText: string) => {
+    await solveWish(id, solutionText);
+    toast("Wish marked as implemented!", "success");
   };
 
   return (
@@ -78,19 +84,58 @@ export function WishesModal({ onClose }: WishesModalProps) {
           </div>
         </div>
 
+        {/* Tabs */}
+        <div className="flex gap-1 px-5 sm:px-6 pt-4">
+          <button
+            onClick={() => setTab("open")}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+              tab === "open"
+                ? "bg-green-600 text-white shadow-sm"
+                : "text-gray-500 hover:bg-gray-100"
+            }`}
+          >
+            <Lightbulb className="w-4 h-4" />
+            Open
+            <span className={`text-xs rounded-full px-1.5 py-0.5 font-semibold ${tab === "open" ? "bg-green-500 text-white" : "bg-gray-100 text-gray-500"}`}>
+              {openWishes.length}
+            </span>
+          </button>
+          <button
+            onClick={() => setTab("solved")}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+              tab === "solved"
+                ? "bg-green-600 text-white shadow-sm"
+                : "text-gray-500 hover:bg-gray-100"
+            }`}
+          >
+            <CheckCircle2 className="w-4 h-4" />
+            Implemented
+            <span className={`text-xs rounded-full px-1.5 py-0.5 font-semibold ${tab === "solved" ? "bg-green-500 text-white" : "bg-gray-100 text-gray-500"}`}>
+              {solvedWishes.length}
+            </span>
+          </button>
+        </div>
+
         {/* List */}
-        <div className="overflow-y-auto flex-1 p-5 sm:p-6 space-y-3">
+        <div className="overflow-y-auto flex-1 px-5 sm:px-6 py-4 space-y-3">
           {!isLoaded ? (
             <div className="flex justify-center py-10">
               <div className="w-7 h-7 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
             </div>
-          ) : sorted.length === 0 ? (
+          ) : displayed.length === 0 ? (
             <div className="text-center py-12 text-gray-400 font-medium">
-              No wishes yet. Be the first!
+              {tab === "open" ? "No open wishes yet. Be the first!" : "No implemented wishes yet."}
             </div>
           ) : (
-            sorted.map((wish, i) => (
-              <WishCard key={wish.id} wish={wish} onVote={handleVote} userVote={userVotes[wish.id] ?? 0} rank={i + 1} />
+            displayed.map((wish, i) => (
+              <WishCard
+                key={wish.id}
+                wish={wish}
+                onVote={handleVote}
+                onSolve={handleSolve}
+                userVote={userVotes[wish.id] ?? 0}
+                rank={i + 1}
+              />
             ))
           )}
         </div>

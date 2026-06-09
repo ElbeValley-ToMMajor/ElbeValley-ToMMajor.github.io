@@ -6,6 +6,7 @@ import {
   onSnapshot,
   addDoc,
   doc,
+  updateDoc,
   runTransaction,
   deleteField,
   increment,
@@ -38,6 +39,8 @@ export function useWishes() {
           creator: raw.creator,
           rating: raw.rating,
           createdAt: raw.createdAt,
+          solved: raw.solved,
+          solutionText: raw.solutionText,
         });
         const v = raw.votes?.[userId];
         if (v === 1 || v === -1) votes[docSnap.id] = v;
@@ -87,5 +90,12 @@ export function useWishes() {
     });
   };
 
-  return { wishes, addWish, voteWish, userVotes, isLoaded };
+  const solveWish = async (id: string, solutionText: string) => {
+    await updateDoc(doc(db, "wishes", id), {
+      solved: true,
+      solutionText,
+    });
+  };
+
+  return { wishes, addWish, voteWish, solveWish, userVotes, isLoaded };
 }

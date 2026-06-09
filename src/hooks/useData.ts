@@ -44,6 +44,8 @@ export function useData() {
           rating: raw.rating,
           solved: raw.solved,
           inProgress: raw.inProgress,
+          progressPercent: raw.progressPercent,
+          progressNote: raw.progressNote,
           createdAt: raw.createdAt,
           solutionText: raw.solutionText,
           solutionImageUrl: raw.solutionImageUrl,
@@ -116,13 +118,23 @@ export function useData() {
 
     await updateDoc(doc(db, "ideas", id), {
       solved: true,
+      inProgress: false,
+      progressPercent: 100,
       solutionText,
       ...(solutionImageUrl ? { solutionImageUrl } : {}),
     });
   };
 
-  const setInProgress = async (id: string, value: boolean) => {
-    await updateDoc(doc(db, "ideas", id), { inProgress: value });
+  const setInProgress = async (
+    id: string,
+    value: boolean,
+    progressNote?: string,
+    progressPercent?: number,
+  ) => {
+    await updateDoc(doc(db, "ideas", id), {
+      inProgress: value,
+      ...(value ? { progressNote: progressNote ?? "", progressPercent: progressPercent ?? 0 } : { progressNote: "", progressPercent: 0 }),
+    });
   };
 
   const deleteIdea = async (id: string) => {

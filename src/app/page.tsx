@@ -243,7 +243,7 @@ function IdeaFindingPageInner() {
           userVote={userVotes[liveSelectedIdea.id] ?? 0}
           onVote={voteIdea}
           onSolve={solveIdea}
-          onSetInProgress={setInProgress}
+          onSetInProgress={(id, value, note, pct) => setInProgress(id, value, note, pct)}
           onDelete={deleteIdea}
           onClose={handleCloseModal}
         />
