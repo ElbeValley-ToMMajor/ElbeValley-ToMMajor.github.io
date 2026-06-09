@@ -25,6 +25,7 @@ export function IdeaForm({ onSubmit, onCancel }: IdeaFormProps) {
     if (username && !creator) setCreator(username);
   }, [username]);
   const [category, setCategory] = useState("Community");
+  const [customCategory, setCustomCategory] = useState("");
   const [costs, setCosts] = useState("");
 
   const handleCostsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,8 +37,9 @@ export function IdeaForm({ onSubmit, onCancel }: IdeaFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !subtitle || !creator || !category) return;
-    onSubmit({ title, subtitle, creator, category, costs: costs || undefined });
+    const finalCategory = category === "Other" ? customCategory.trim() || "Other" : category;
+    if (!title || !subtitle || !creator || !finalCategory) return;
+    onSubmit({ title, subtitle, creator, category: finalCategory, costs: costs || undefined });
   };
 
   return (
@@ -104,15 +106,26 @@ export function IdeaForm({ onSubmit, onCancel }: IdeaFormProps) {
               <select
                 id="category"
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                onChange={(e) => { setCategory(e.target.value); setCustomCategory(""); }}
                 className={inputClass}
               >
                 <option value="Community">Community</option>
                 <option value="Infrastructure">Infrastructure</option>
                 <option value="Environment">Environment</option>
                 <option value="Events">Events</option>
-                <option value="Other">Other</option>
+                <option value="Other">Other…</option>
               </select>
+              {category === "Other" && (
+                <input
+                  type="text"
+                  autoFocus
+                  required
+                  value={customCategory}
+                  onChange={(e) => setCustomCategory(e.target.value)}
+                  className={inputClass + " mt-2"}
+                  placeholder="Enter your category"
+                />
+              )}
             </div>
             <div>
               <label htmlFor="costs" className={labelClass}>Est. Costs</label>

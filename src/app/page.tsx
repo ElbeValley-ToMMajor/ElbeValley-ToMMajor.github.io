@@ -3,22 +3,24 @@
 import { useState, useMemo } from "react";
 import { useData } from "@/hooks/useData";
 import { IdeaCard } from "@/components/IdeaCard";
+import { IdeaDetailModal } from "@/components/IdeaDetailModal";
 import { LeftSidebar } from "@/components/LeftSidebar";
 import { IdeaForm } from "@/components/IdeaForm";
+import { Idea } from "@/types";
 import { Plus, LayoutGrid, Trophy, CheckCircle2, Tag, Lightbulb } from "lucide-react";
 import Link from "next/link";
 
 export default function IdeaFindingPage() {
-  const { ideas, addIdea, voteIdea, userVotes, isLoaded } = useData();
+  const { ideas, addIdea, voteIdea, solveIdea, userVotes, isLoaded } = useData();
   const [activeFilter, setActiveFilter] = useState("all");
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [selectedIdea, setSelectedIdea] = useState<Idea | null>(null);
 
   const categories = useMemo(() => {
     const cats = new Set(ideas.map((idea) => idea.category));
     return Array.from(cats);
   }, [ideas]);
 
-  // Counts for sidebar badges
   const ideaCounts = useMemo(() => {
     const counts: Record<string, number> = { solved: 0 };
     for (const idea of ideas) {
@@ -30,7 +32,6 @@ export default function IdeaFindingPage() {
 
   const filteredIdeas = useMemo(() => {
     let result = [...ideas];
-
     if (activeFilter === "top10") {
       result.sort((a, b) => b.rating - a.rating);
       result = result.slice(0, 10);
@@ -39,11 +40,9 @@ export default function IdeaFindingPage() {
     } else if (activeFilter !== "all") {
       result = result.filter((idea) => idea.category === activeFilter);
     }
-
     if (activeFilter !== "top10") {
       result.sort((a, b) => b.rating - a.rating);
     }
-
     return result;
   }, [ideas, activeFilter]);
 
@@ -52,6 +51,11 @@ export default function IdeaFindingPage() {
     activeFilter === "solved" ? "Solved Ideas" :
     activeFilter === "all" ? "All Ideas" :
     `${activeFilter} Ideas`;
+
+  // Keep the modal in sync if the underlying idea updates (e.g. after a vote or solve)
+  const liveSelectedIdea = selectedIdea
+    ? ideas.find((i) => i.id === selectedIdea.id) ?? null
+    : null;
 
   if (!isLoaded) {
     return (
@@ -96,7 +100,6 @@ export default function IdeaFindingPage() {
               {chip.label}
             </button>
           ))}
-          {/* Feature Wishes – navigates to /wishes */}
           <Link
             href="/wishes"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap bg-white text-gray-600 border border-gray-200 hover:border-green-300 hover:text-green-700 transition-all"
@@ -109,7 +112,6 @@ export default function IdeaFindingPage() {
 
       {/* Main content */}
       <div className="flex-1 min-w-0">
-        {/* Page header */}
         <div className="flex justify-between items-center mb-5">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{headingLabel}</h1>
@@ -127,7 +129,6 @@ export default function IdeaFindingPage() {
           </button>
         </div>
 
-        {/* Cards */}
         <div className="space-y-3 sm:space-y-4">
           {filteredIdeas.length === 0 ? (
             <div className="bg-white rounded-xl border border-green-100 p-12 text-center">
@@ -135,13 +136,31 @@ export default function IdeaFindingPage() {
             </div>
           ) : (
             filteredIdeas.map((idea, index) => (
-              <IdeaCard key={idea.id} idea={idea} onVote={voteIdea} userVote={userVotes[idea.id] ?? 0} rank={index + 1} />
+              <IdeaCard
+                key={idea.id}
+                idea={idea}
+                onVote={voteIdea}
+                onOpen={setSelectedIdea}
+                userVote={userVotes[idea.id] ?? 0}
+                rank={index + 1}
+              />
             ))
           )}
         </div>
       </div>
 
-      {/* Form modal */}
+      {/* Idea detail modal */}
+      {liveSelectedIdea && (
+        <IdeaDetailModal
+          idea={liveSelectedIdea}
+          userVote={userVotes[liveSelectedIdea.id] ?? 0}
+          onVote={voteIdea}
+          onSolve={solveIdea}
+          onClose={() => setSelectedIdea(null)}
+        />
+      )}
+
+      {/* New idea form modal */}
       {isFormOpen && (
         <IdeaForm
           onSubmit={(ideaData) => {
