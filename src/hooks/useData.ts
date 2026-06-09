@@ -7,6 +7,7 @@ import {
   addDoc,
   doc,
   updateDoc,
+  deleteDoc,
   runTransaction,
   deleteField,
   increment,
@@ -42,6 +43,7 @@ export function useData() {
           costs: raw.costs,
           rating: raw.rating,
           solved: raw.solved,
+          inProgress: raw.inProgress,
           createdAt: raw.createdAt,
           solutionText: raw.solutionText,
           solutionImageUrl: raw.solutionImageUrl,
@@ -119,5 +121,13 @@ export function useData() {
     });
   };
 
-  return { ideas, addIdea, voteIdea, solveIdea, userVotes, isLoaded };
+  const setInProgress = async (id: string, value: boolean) => {
+    await updateDoc(doc(db, "ideas", id), { inProgress: value });
+  };
+
+  const deleteIdea = async (id: string) => {
+    await deleteDoc(doc(db, "ideas", id));
+  };
+
+  return { ideas, addIdea, voteIdea, solveIdea, setInProgress, deleteIdea, userVotes, isLoaded };
 }

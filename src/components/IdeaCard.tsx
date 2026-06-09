@@ -1,7 +1,7 @@
 "use client";
 
 import { Idea } from "@/types";
-import { ThumbsUp, ThumbsDown, CheckCircle2, CalendarDays, Banknote } from "lucide-react";
+import { ThumbsUp, ThumbsDown, CheckCircle2, Clock, CalendarDays, Banknote } from "lucide-react";
 import { formatCosts } from "@/lib/formatCosts";
 
 interface IdeaCardProps {
@@ -60,6 +60,12 @@ export function IdeaCard({ idea, onVote, onOpen, userVote = 0, rank }: IdeaCardP
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
               <CheckCircle2 className="w-3 h-3" />
               Solved
+            </span>
+          )}
+          {!idea.solved && idea.inProgress && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+              <Clock className="w-3 h-3" />
+              In Progress
             </span>
           )}
         </div>

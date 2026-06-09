@@ -1,13 +1,13 @@
 "use client";
 
 import { LayoutGrid, Trophy, CheckCircle2, Tag, Lightbulb } from "lucide-react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 interface LeftSidebarProps {
   categories: string[];
   activeFilter: string;
   onFilterChange: (filter: string) => void;
+  onOpenWishes: () => void;
   ideaCounts: Record<string, number>;
   totalCount: number;
 }
@@ -16,6 +16,7 @@ export function LeftSidebar({
   categories,
   activeFilter,
   onFilterChange,
+  onOpenWishes,
   ideaCounts,
   totalCount,
 }: LeftSidebarProps) {
@@ -58,16 +59,16 @@ export function LeftSidebar({
               </span>
             </button>
 
-            {/* Feature Wishes — nav link */}
-            <Link
-              href="/wishes"
-              className={`${baseBtn} ${pathname === "/wishes" ? activeBtn : inactiveBtn}`}
+            {/* Feature Wishes — opens modal */}
+            <button
+              onClick={onOpenWishes}
+              className={`${baseBtn} ${inactiveBtn}`}
             >
               <span className="flex items-center gap-2.5">
-                <Lightbulb className={`w-4 h-4 ${pathname === "/wishes" ? "text-yellow-300" : "text-gray-400 group-hover:text-green-600"}`} />
+                <Lightbulb className="w-4 h-4 text-gray-400 group-hover:text-green-600" />
                 Feature Wishes
               </span>
-            </Link>
+            </button>
           </div>
         </div>
 

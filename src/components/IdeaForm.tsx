@@ -128,16 +128,19 @@ export function IdeaForm({ onSubmit, onCancel }: IdeaFormProps) {
               )}
             </div>
             <div>
-              <label htmlFor="costs" className={labelClass}>Est. Costs</label>
-              <input
-                type="text"
-                id="costs"
-                value={costs}
-                onChange={handleCostsChange}
-                className={inputClass}
-                placeholder="z.B. 5.000"
-                inputMode="numeric"
-              />
+              <label htmlFor="costs" className={labelClass}>Amount (EUR)</label>
+              <div className="relative mt-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">€</span>
+                <input
+                  type="text"
+                  id="costs"
+                  value={costs}
+                  onChange={handleCostsChange}
+                  className="block w-full rounded-lg border border-gray-200 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-500/20 sm:text-sm pl-7 pr-3 py-2.5 bg-white outline-none transition-all"
+                  placeholder="5.000"
+                  inputMode="numeric"
+                />
+              </div>
             </div>
           </div>
 

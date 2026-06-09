@@ -16,6 +16,7 @@ export interface Idea {
   costs?: string;
   rating: number;
   solved: boolean;
+  inProgress?: boolean;
   createdAt: number;
   solutionText?: string;
   solutionImageUrl?: string;
