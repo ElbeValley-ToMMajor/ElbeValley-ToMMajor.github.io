@@ -11,7 +11,7 @@ import { LeftSidebar } from "@/components/LeftSidebar";
 import { IdeaForm } from "@/components/IdeaForm";
 import { Idea } from "@/types";
 import {
-  Plus, LayoutGrid, Trophy, CheckCircle2,
+  Plus, LayoutGrid, Trophy, CheckCircle2, Clock,
   Tag, Lightbulb, Search, ArrowDownUp, X,
 } from "lucide-react";
 
@@ -50,10 +50,11 @@ function IdeaFindingPageInner() {
   const categories = useMemo(() => Array.from(new Set(ideas.map((i) => i.category))), [ideas]);
 
   const ideaCounts = useMemo(() => {
-    const counts: Record<string, number> = { solved: 0 };
+    const counts: Record<string, number> = { solved: 0, started: 0 };
     for (const idea of ideas) {
       counts[idea.category] = (counts[idea.category] ?? 0) + 1;
       if (idea.solved) counts["solved"]++;
+      if (idea.inProgress && !idea.solved) counts["started"]++;
     }
     return counts;
   }, [ideas]);
@@ -67,6 +68,8 @@ function IdeaFindingPageInner() {
       result = result.slice(0, 10);
     } else if (activeFilter === "solved") {
       result = result.filter((i) => i.solved);
+    } else if (activeFilter === "started") {
+      result = result.filter((i) => i.inProgress && !i.solved);
     } else if (activeFilter !== "all") {
       result = result.filter((i) => i.category === activeFilter);
     }
@@ -95,9 +98,10 @@ function IdeaFindingPageInner() {
   }, [ideas, activeFilter, search, sortBy]);
 
   const headingLabel =
-    activeFilter === "top10" ? "Top 10 Ideas" :
-    activeFilter === "solved" ? "Solved Ideas" :
-    activeFilter === "all" ? "All Ideas" :
+    activeFilter === "top10"   ? "Top 10 Ideas" :
+    activeFilter === "solved"  ? "Solved Ideas" :
+    activeFilter === "started" ? "Started Ideas" :
+    activeFilter === "all"     ? "All Ideas" :
     `${activeFilter} Ideas`;
 
   // Keep modal in sync with live Firestore updates
@@ -131,9 +135,10 @@ function IdeaFindingPageInner() {
       <div className="md:hidden -mx-4 px-4 overflow-x-auto pb-1">
         <div className="flex items-center gap-2 w-max">
           {[
-            { key: "all",    label: "All Ideas", icon: <LayoutGrid className="w-3.5 h-3.5" /> },
-            { key: "top10",  label: "Top 10",    icon: <Trophy className="w-3.5 h-3.5" /> },
-            { key: "solved", label: "Solved",    icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
+            { key: "all",     label: "All Ideas", icon: <LayoutGrid className="w-3.5 h-3.5" /> },
+            { key: "top10",   label: "Top 10",    icon: <Trophy className="w-3.5 h-3.5" /> },
+            { key: "started", label: "Started",   icon: <Clock className="w-3.5 h-3.5" /> },
+            { key: "solved",  label: "Solved",    icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
             ...categories.map((c) => ({ key: c, label: c, icon: <Tag className="w-3.5 h-3.5" /> })),
           ].map((chip) => (
             <button

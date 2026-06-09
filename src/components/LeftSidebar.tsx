@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutGrid, Trophy, CheckCircle2, Tag, Lightbulb } from "lucide-react";
+import { LayoutGrid, Trophy, CheckCircle2, Clock, Tag, Lightbulb } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 interface LeftSidebarProps {
@@ -43,6 +43,19 @@ export function LeftSidebar({
               <span className="flex items-center gap-2.5">
                 <Trophy className={`w-4 h-4 ${activeFilter === "top10" && pathname === "/" ? "text-yellow-300" : "text-gray-400 group-hover:text-green-600"}`} />
                 Top 10 Votes
+              </span>
+            </button>
+
+            <button
+              onClick={() => onFilterChange("started")}
+              className={`${baseBtn} ${activeFilter === "started" && pathname === "/" ? "bg-blue-600 text-white shadow-sm" : inactiveBtn}`}
+            >
+              <span className="flex items-center gap-2.5">
+                <Clock className={`w-4 h-4 ${activeFilter === "started" && pathname === "/" ? "text-blue-200" : "text-gray-400 group-hover:text-green-600"}`} />
+                Started Ideas
+              </span>
+              <span className={`text-xs rounded-full px-1.5 py-0.5 font-semibold ${activeFilter === "started" && pathname === "/" ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-500"}`}>
+                {ideaCounts["started"] ?? 0}
               </span>
             </button>
 
