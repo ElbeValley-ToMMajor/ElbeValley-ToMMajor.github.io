@@ -2,6 +2,7 @@
 
 import { LayoutGrid, Trophy, CheckCircle2, Clock, Tag, Lightbulb } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useT } from "@/context/LanguageContext";
 
 interface LeftSidebarProps {
   categories: string[];
@@ -21,6 +22,7 @@ export function LeftSidebar({
   totalCount,
 }: LeftSidebarProps) {
   const pathname = usePathname();
+  const t = useT();
 
   const baseBtn =
     "w-full group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg transition-all";
@@ -33,7 +35,7 @@ export function LeftSidebar({
         {/* Discover */}
         <div>
           <h3 className="px-3 text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
-            Discover
+            {t("discover")}
           </h3>
           <div className="space-y-1">
             <button
@@ -42,7 +44,7 @@ export function LeftSidebar({
             >
               <span className="flex items-center gap-2.5">
                 <Trophy className={`w-4 h-4 ${activeFilter === "top10" && pathname === "/" ? "text-yellow-300" : "text-gray-400 group-hover:text-green-600"}`} />
-                Top 10 Votes
+                {t("top10Votes")}
               </span>
             </button>
 
@@ -52,7 +54,7 @@ export function LeftSidebar({
             >
               <span className="flex items-center gap-2.5">
                 <Clock className={`w-4 h-4 ${activeFilter === "started" && pathname === "/" ? "text-blue-200" : "text-gray-400 group-hover:text-green-600"}`} />
-                Started Ideas
+                {t("startedIdeas")}
               </span>
               <span className={`text-xs rounded-full px-1.5 py-0.5 font-semibold ${activeFilter === "started" && pathname === "/" ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-500"}`}>
                 {ideaCounts["started"] ?? 0}
@@ -65,7 +67,7 @@ export function LeftSidebar({
             >
               <span className="flex items-center gap-2.5">
                 <CheckCircle2 className={`w-4 h-4 ${activeFilter === "solved" && pathname === "/" ? "text-green-300" : "text-gray-400 group-hover:text-green-600"}`} />
-                Solved Ideas
+                {t("solvedIdeas")}
               </span>
               <span className={`text-xs rounded-full px-1.5 py-0.5 font-semibold ${activeFilter === "solved" && pathname === "/" ? "bg-green-500 text-white" : "bg-gray-100 text-gray-500"}`}>
                 {ideaCounts["solved"] ?? 0}
@@ -79,7 +81,7 @@ export function LeftSidebar({
             >
               <span className="flex items-center gap-2.5">
                 <Lightbulb className="w-4 h-4 text-gray-400 group-hover:text-green-600" />
-                Feature Wishes
+                {t("featureWishes")}
               </span>
             </button>
           </div>
@@ -88,7 +90,7 @@ export function LeftSidebar({
         {/* Categories */}
         <div>
           <h3 className="px-3 text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
-            Categories
+            {t("categories")}
           </h3>
           <div className="space-y-1">
             <button
@@ -97,7 +99,7 @@ export function LeftSidebar({
             >
               <span className="flex items-center gap-2.5">
                 <LayoutGrid className={`w-4 h-4 ${activeFilter === "all" && pathname === "/" ? "text-white" : "text-gray-400 group-hover:text-green-600"}`} />
-                All Ideas
+                {t("allIdeas")}
               </span>
               <span className={`text-xs rounded-full px-1.5 py-0.5 font-semibold ${activeFilter === "all" && pathname === "/" ? "bg-green-500 text-white" : "bg-gray-100 text-gray-500"}`}>
                 {totalCount}

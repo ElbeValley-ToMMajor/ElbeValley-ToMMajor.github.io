@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Idea } from "@/types";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useToast } from "@/context/ToastContext";
+import { useT } from "@/context/LanguageContext";
 import { AdminSolveModal } from "@/components/AdminSolveModal";
 import { formatCosts } from "@/lib/formatCosts";
 import {
@@ -32,12 +33,13 @@ interface IdeaDetailModalProps {
 
 /** Thin progress bar shown to all users when an idea has progress data. */
 function ProgressBar({ percent, note, solved }: { percent: number; note?: string; solved?: boolean }) {
+  const t = useT();
   const pct = Math.min(100, Math.max(0, percent));
   return (
     <div className={`mt-6 p-4 rounded-xl border ${solved ? "bg-green-50 border-green-200" : "bg-blue-50 border-blue-200"}`}>
       <div className="flex items-center justify-between mb-2">
         <span className={`text-xs font-bold uppercase tracking-wider ${solved ? "text-green-700" : "text-blue-700"}`}>
-          {solved ? "Completed" : "Progress"}
+          {solved ? t("completed") : t("progress")}
         </span>
         <span className={`text-sm font-bold tabular-nums ${solved ? "text-green-700" : "text-blue-700"}`}>
           {pct}%
@@ -63,6 +65,7 @@ export function IdeaDetailModal({
 }: IdeaDetailModalProps) {
   const { isAdmin } = useAdmin();
   const { toast } = useToast();
+  const t = useT();
 
   const [solveOpen, setSolveOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -78,21 +81,21 @@ export function IdeaDetailModal({
 
   const handleVote = (dir: 1 | -1) => {
     onVote(idea.id, dir);
-    toast(dir === 1 ? "Upvote saved!" : "Downvote saved!", "success");
+    toast(dir === 1 ? t("upvoteSaved") : t("downvoteSaved"), "success");
   };
 
   const handleShare = () => {
     const url = `${window.location.origin}${window.location.pathname}?idea=${idea.id}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
-      toast("Link copied to clipboard!", "info");
+      toast(t("linkCopied"), "info");
       setTimeout(() => setCopied(false), 2000);
     });
   };
 
   const handleDelete = async () => {
     await onDelete(idea.id);
-    toast("Idea deleted.", "info");
+    toast(t("ideaDeleted"), "info");
     onClose();
   };
 
@@ -101,13 +104,13 @@ export function IdeaDetailModal({
     await onSetInProgress(idea.id, true, progressNote, progressPercent);
     setSavingProgress(false);
     setProgressFormOpen(false);
-    toast("Progress updated.", "info");
+    toast(t("progressUpdated"), "info");
   };
 
   const handleUndoInProgress = async () => {
     await onSetInProgress(idea.id, false);
     setProgressFormOpen(false);
-    toast("Marked as Open.", "info");
+    toast(t("markedAsOpen"), "info");
   };
 
   // Show progress bar if there's meaningful progress data
@@ -144,17 +147,17 @@ export function IdeaDetailModal({
                 </span>
                 {idea.solved && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800">
-                    <CheckCircle2 className="w-4 h-4" />Solved
+                    <CheckCircle2 className="w-4 h-4" />{t("solved")}
                   </span>
                 )}
                 {!idea.solved && idea.inProgress && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
-                    <Clock className="w-4 h-4" />In Progress
+                    <Clock className="w-4 h-4" />{t("inProgress")}
                   </span>
                 )}
               </div>
               <div className="flex items-center gap-1 flex-shrink-0">
-                <button onClick={handleShare} title="Copy shareable link"
+                <button onClick={handleShare} title={t("copyShareableLink")}
                   className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
                   {copied ? <Check className="w-4 h-4 text-green-600" /> : <Share2 className="w-4 h-4" />}
                 </button>
@@ -174,7 +177,7 @@ export function IdeaDetailModal({
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pb-5 mb-5 border-b border-gray-100 text-sm">
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4 text-green-600" />
-                <span className="text-gray-500">by</span>
+                <span className="text-gray-500">{t("by")}</span>
                 <span className="font-semibold text-gray-900">{idea.creator}</span>
               </div>
               <div className="flex items-center gap-2 text-gray-500">
@@ -194,7 +197,7 @@ export function IdeaDetailModal({
             {/* Description + vote */}
             <div className="flex items-start gap-6">
               <div className="flex-1 min-w-0">
-                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">About this idea</h3>
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{t("aboutThisIdea")}</h3>
                 <p className="text-gray-700 leading-relaxed text-base whitespace-pre-wrap">{idea.subtitle}</p>
               </div>
 
@@ -211,7 +214,7 @@ export function IdeaDetailModal({
                   aria-label="Downvote">
                   <ThumbsDown className="w-6 h-6" />
                 </button>
-                <span className="mt-2 text-xs text-gray-400 font-medium">votes</span>
+                <span className="mt-2 text-xs text-gray-400 font-medium">{t("votes")}</span>
               </div>
             </div>
 
@@ -229,7 +232,7 @@ export function IdeaDetailModal({
               <div className="mt-6 p-5 bg-green-50 rounded-xl border border-green-200">
                 <div className="flex items-center gap-2 mb-3">
                   <CheckCircle2 className="w-5 h-5 text-green-600" />
-                  <h3 className="text-sm font-bold text-green-800 uppercase tracking-wider">Solution</h3>
+                  <h3 className="text-sm font-bold text-green-800 uppercase tracking-wider">{t("solutionLabel")}</h3>
                 </div>
                 {idea.solutionText && (
                   <p className="text-gray-700 leading-relaxed whitespace-pre-wrap mb-4">{idea.solutionText}</p>
@@ -246,7 +249,7 @@ export function IdeaDetailModal({
               <div className="mt-6 pt-5 border-t border-gray-100">
                 <div className="flex flex-wrap items-center gap-2 mb-3">
                   <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5" /> Admin
+                    <ShieldCheck className="w-3.5 h-3.5" /> {t("adminLabel")}
                   </span>
 
                   {/* Open → show progress form */}
@@ -255,7 +258,7 @@ export function IdeaDetailModal({
                       onClick={() => { setProgressNote(""); setProgressPercent(0); setProgressFormOpen(true); }}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors"
                     >
-                      <Clock className="w-4 h-4" /> Mark In Progress
+                      <Clock className="w-4 h-4" /> {t("markInProgress")}
                     </button>
                   )}
 
@@ -266,13 +269,13 @@ export function IdeaDetailModal({
                         onClick={() => { setProgressNote(idea.progressNote ?? ""); setProgressPercent(idea.progressPercent ?? 0); setProgressFormOpen(true); }}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors"
                       >
-                        <Clock className="w-4 h-4" /> Edit Progress
+                        <Clock className="w-4 h-4" /> {t("editProgress")}
                       </button>
                       <button
                         onClick={handleUndoInProgress}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
                       >
-                        Undo In Progress
+                        {t("undoInProgress")}
                       </button>
                     </>
                   )}
@@ -282,7 +285,7 @@ export function IdeaDetailModal({
                       onClick={() => setSolveOpen(true)}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-green-100 text-green-800 hover:bg-green-200 transition-colors"
                     >
-                      <CheckCircle2 className="w-4 h-4" /> Mark as Solved
+                      <CheckCircle2 className="w-4 h-4" /> {t("markAsSolved")}
                     </button>
                   )}
 
@@ -290,18 +293,18 @@ export function IdeaDetailModal({
                   {!confirmDelete ? (
                     <button onClick={() => setConfirmDelete(true)}
                       className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition-colors">
-                      <Trash2 className="w-4 h-4" /> Delete
+                      <Trash2 className="w-4 h-4" /> {t("deleteLabel")}
                     </button>
                   ) : (
                     <div className="ml-auto flex items-center gap-2">
-                      <span className="text-xs text-red-600 font-medium">Sure?</span>
+                      <span className="text-xs text-red-600 font-medium">{t("sure")}</span>
                       <button onClick={handleDelete}
                         className="px-3 py-1.5 rounded-lg text-sm font-semibold bg-red-600 text-white hover:bg-red-700 transition-colors">
-                        Yes, delete
+                        {t("yesDelete")}
                       </button>
                       <button onClick={() => setConfirmDelete(false)}
                         className="px-3 py-1.5 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
-                        Cancel
+                        {t("cancel")}
                       </button>
                     </div>
                   )}
@@ -313,7 +316,7 @@ export function IdeaDetailModal({
                     {/* % slider + numeric input */}
                     <div>
                       <div className="flex items-center justify-between mb-1">
-                        <label className="text-sm font-semibold text-blue-800">Progress</label>
+                        <label className="text-sm font-semibold text-blue-800">{t("progress")}</label>
                         <div className="flex items-center gap-1">
                           <input
                             type="number"
@@ -336,12 +339,12 @@ export function IdeaDetailModal({
 
                     {/* Note field */}
                     <div>
-                      <label className="text-sm font-semibold text-blue-800 block mb-1">Status Note</label>
+                      <label className="text-sm font-semibold text-blue-800 block mb-1">{t("statusNote")}</label>
                       <textarea
                         rows={2}
                         value={progressNote}
                         onChange={(e) => setProgressNote(e.target.value)}
-                        placeholder="e.g., Funding approved, procurement started…"
+                        placeholder={t("progressPlaceholder")}
                         className="w-full rounded-lg border border-blue-300 px-3 py-2 text-sm bg-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all resize-none"
                       />
                     </div>
@@ -351,14 +354,14 @@ export function IdeaDetailModal({
                         onClick={() => setProgressFormOpen(false)}
                         className="flex-1 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                       >
-                        Cancel
+                        {t("cancel")}
                       </button>
                       <button
                         onClick={handleSaveProgress}
                         disabled={savingProgress}
                         className="flex-1 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                       >
-                        {savingProgress ? "Saving…" : "Save Progress"}
+                        {savingProgress ? t("saving") : t("saveProgress")}
                       </button>
                     </div>
                   </div>
@@ -376,7 +379,7 @@ export function IdeaDetailModal({
           onConfirm={async (text, file) => {
             await onSolve(idea.id, text, file);
             setSolveOpen(false);
-            toast("Idea marked as solved!", "success");
+            toast(t("ideaSolved"), "success");
           }}
           onCancel={() => setSolveOpen(false)}
         />

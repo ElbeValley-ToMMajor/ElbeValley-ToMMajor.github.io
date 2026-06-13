@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useData } from "@/hooks/useData";
 import { useToast } from "@/context/ToastContext";
+import { useT } from "@/context/LanguageContext";
 import { IdeaCard } from "@/components/IdeaCard";
 import { IdeaDetailModal } from "@/components/IdeaDetailModal";
 import { WishesModal } from "@/components/WishesModal";
@@ -19,6 +20,7 @@ import {
 function IdeaFindingPageInner() {
   const { ideas, addIdea, voteIdea, solveIdea, setInProgress, deleteIdea, userVotes, isLoaded } = useData();
   const { toast } = useToast();
+  const t = useT();
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -98,11 +100,11 @@ function IdeaFindingPageInner() {
   }, [ideas, activeFilter, search, sortBy]);
 
   const headingLabel =
-    activeFilter === "top10"   ? "Top 10 Ideas" :
-    activeFilter === "solved"  ? "Solved Ideas" :
-    activeFilter === "started" ? "Started Ideas" :
-    activeFilter === "all"     ? "All Ideas" :
-    `${activeFilter} Ideas`;
+    activeFilter === "top10"   ? t("top10IdeasHeading") :
+    activeFilter === "solved"  ? t("solvedIdeasHeading") :
+    activeFilter === "started" ? t("startedIdeasHeading") :
+    activeFilter === "all"     ? t("allIdeasHeading") :
+    `${activeFilter} ${t("ideaPlural")}`;
 
   // Keep modal in sync with live Firestore updates
   const liveSelectedIdea = selectedIdea
@@ -135,10 +137,10 @@ function IdeaFindingPageInner() {
       <div className="md:hidden -mx-4 px-4 overflow-x-auto pb-1">
         <div className="flex items-center gap-2 w-max">
           {[
-            { key: "all",     label: "All Ideas", icon: <LayoutGrid className="w-3.5 h-3.5" /> },
-            { key: "top10",   label: "Top 10",    icon: <Trophy className="w-3.5 h-3.5" /> },
-            { key: "started", label: "Started",   icon: <Clock className="w-3.5 h-3.5" /> },
-            { key: "solved",  label: "Solved",    icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
+            { key: "all",     label: t("allIdeas"),        icon: <LayoutGrid className="w-3.5 h-3.5" /> },
+            { key: "top10",   label: t("top10Chip"),        icon: <Trophy className="w-3.5 h-3.5" /> },
+            { key: "started", label: t("startedChip"),      icon: <Clock className="w-3.5 h-3.5" /> },
+            { key: "solved",  label: t("solvedChip"),       icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
             ...categories.map((c) => ({ key: c, label: c, icon: <Tag className="w-3.5 h-3.5" /> })),
           ].map((chip) => (
             <button
@@ -157,7 +159,7 @@ function IdeaFindingPageInner() {
             onClick={() => setWishesOpen(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap bg-white text-gray-600 border border-gray-200 hover:border-green-300 hover:text-green-700 transition-all"
           >
-            <Lightbulb className="w-3.5 h-3.5" />Feature Wishes
+            <Lightbulb className="w-3.5 h-3.5" />{t("featureWishesChip")}
           </button>
         </div>
       </div>
@@ -169,8 +171,8 @@ function IdeaFindingPageInner() {
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{headingLabel}</h1>
             <p className="text-sm text-gray-500 mt-0.5">
-              {filteredIdeas.length} {filteredIdeas.length === 1 ? "idea" : "ideas"}
-              {search && " matching your search"}
+              {filteredIdeas.length} {filteredIdeas.length === 1 ? t("ideaSingular") : t("ideaPlural")}
+              {search && ` ${t("matchingSearch")}`}
             </p>
           </div>
           <button
@@ -178,8 +180,8 @@ function IdeaFindingPageInner() {
             className="inline-flex items-center gap-2 px-3 py-2 sm:px-4 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 active:bg-green-800 transition-colors shadow-sm"
           >
             <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">New Idea</span>
-            <span className="sm:hidden">Add</span>
+            <span className="hidden sm:inline">{t("newIdea")}</span>
+            <span className="sm:hidden">{t("add")}</span>
           </button>
         </div>
 
@@ -191,7 +193,7 @@ function IdeaFindingPageInner() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search ideas…"
+              placeholder={t("searchIdeas")}
               className="w-full pl-9 pr-8 py-2 rounded-lg border border-gray-200 bg-white text-sm outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all"
             />
             {search && (
@@ -209,7 +211,7 @@ function IdeaFindingPageInner() {
             title="Toggle sort order"
           >
             <ArrowDownUp className="w-4 h-4" />
-            <span className="hidden sm:inline">{sortBy === "votes" ? "Top Voted" : "Newest"}</span>
+            <span className="hidden sm:inline">{sortBy === "votes" ? t("topVoted") : t("newest")}</span>
           </button>
         </div>
 
@@ -218,7 +220,7 @@ function IdeaFindingPageInner() {
           {filteredIdeas.length === 0 ? (
             <div className="bg-white rounded-xl border border-green-100 p-12 text-center">
               <p className="text-gray-400 font-medium">
-                {search ? `No ideas matching "${search}".` : "No ideas found for this filter."}
+                {search ? `${t("noIdeasMatching")} "${search}".` : t("noIdeasFilter")}
               </p>
             </div>
           ) : (
@@ -258,7 +260,7 @@ function IdeaFindingPageInner() {
           onSubmit={(ideaData) => {
             addIdea(ideaData);
             setIsFormOpen(false);
-            toast("Idea submitted!", "success");
+            toast(t("ideaSubmitted"), "success");
           }}
           onCancel={() => setIsFormOpen(false)}
         />

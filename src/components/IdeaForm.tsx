@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Idea } from "@/types";
 import { X } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
+import { useT } from "@/context/LanguageContext";
 
 interface IdeaFormProps {
   onSubmit: (idea: Omit<Idea, "id" | "rating" | "solved" | "createdAt">) => void;
@@ -16,6 +17,7 @@ const labelClass = "block text-sm font-semibold text-gray-700";
 
 export function IdeaForm({ onSubmit, onCancel }: IdeaFormProps) {
   const { username } = useUser();
+  const t = useT();
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [creator, setCreator] = useState(username);
@@ -46,7 +48,7 @@ export function IdeaForm({ onSubmit, onCancel }: IdeaFormProps) {
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-900">Propose a New Idea</h2>
+          <h2 className="text-xl font-bold text-gray-900">{t("proposeNewIdea")}</h2>
           <button
             onClick={onCancel}
             className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
@@ -57,7 +59,7 @@ export function IdeaForm({ onSubmit, onCancel }: IdeaFormProps) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="title" className={labelClass}>Title *</label>
+            <label htmlFor="title" className={labelClass}>{t("titleLabel")}</label>
             <input
               type="text"
               id="title"
@@ -65,12 +67,12 @@ export function IdeaForm({ onSubmit, onCancel }: IdeaFormProps) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className={inputClass}
-              placeholder="e.g., New cycling path on Elbestraße"
+              placeholder={t("titlePlaceholder")}
             />
           </div>
 
           <div>
-            <label htmlFor="subtitle" className={labelClass}>Description *</label>
+            <label htmlFor="subtitle" className={labelClass}>{t("descriptionLabel")}</label>
             <textarea
               id="subtitle"
               required
@@ -78,15 +80,15 @@ export function IdeaForm({ onSubmit, onCancel }: IdeaFormProps) {
               value={subtitle}
               onChange={(e) => setSubtitle(e.target.value)}
               className={inputClass}
-              placeholder="Describe your idea in more detail..."
+              placeholder={t("descriptionPlaceholder")}
             />
           </div>
 
           <div>
             <label htmlFor="creator" className={labelClass}>
-              Your Name *
+              {t("yourNameField")}
               {username && (
-                <span className="ml-2 text-xs font-normal text-green-600">(from your profile)</span>
+                <span className="ml-2 text-xs font-normal text-green-600">{t("fromYourProfile")}</span>
               )}
             </label>
             <input
@@ -102,7 +104,7 @@ export function IdeaForm({ onSubmit, onCancel }: IdeaFormProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="category" className={labelClass}>Category *</label>
+              <label htmlFor="category" className={labelClass}>{t("categoryLabel")}</label>
               <select
                 id="category"
                 value={category}
@@ -123,12 +125,12 @@ export function IdeaForm({ onSubmit, onCancel }: IdeaFormProps) {
                   value={customCategory}
                   onChange={(e) => setCustomCategory(e.target.value)}
                   className={inputClass + " mt-2"}
-                  placeholder="Enter your category"
+                  placeholder={t("enterCategory")}
                 />
               )}
             </div>
             <div>
-              <label htmlFor="costs" className={labelClass}>Amount (EUR)</label>
+              <label htmlFor="costs" className={labelClass}>{t("amountEur")}</label>
               <div className="relative mt-1">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">€</span>
                 <input
@@ -150,13 +152,13 @@ export function IdeaForm({ onSubmit, onCancel }: IdeaFormProps) {
               onClick={onCancel}
               className="flex-1 px-4 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
               className="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors shadow-sm"
             >
-              Submit Idea
+              {t("submitIdea")}
             </button>
           </div>
         </form>

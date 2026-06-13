@@ -3,6 +3,7 @@
 import { Idea } from "@/types";
 import { ThumbsUp, ThumbsDown, CheckCircle2, Clock, CalendarDays, Banknote } from "lucide-react";
 import { formatCosts } from "@/lib/formatCosts";
+import { useT } from "@/context/LanguageContext";
 
 interface IdeaCardProps {
   idea: Idea;
@@ -33,6 +34,8 @@ function categoryBadge(category: string) {
 }
 
 export function IdeaCard({ idea, onVote, onOpen, userVote = 0, rank }: IdeaCardProps) {
+  const t = useT();
+
   const rankColor =
     rank === 1 ? "text-yellow-500 border-yellow-400 bg-yellow-50" :
     rank === 2 ? "text-gray-400 border-gray-300 bg-gray-50" :
@@ -59,13 +62,13 @@ export function IdeaCard({ idea, onVote, onOpen, userVote = 0, rank }: IdeaCardP
           {idea.solved && (
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
               <CheckCircle2 className="w-3 h-3" />
-              Solved
+              {t("solved")}
             </span>
           )}
           {!idea.solved && idea.inProgress && (
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
               <Clock className="w-3 h-3" />
-              In Progress
+              {t("inProgress")}
             </span>
           )}
         </div>

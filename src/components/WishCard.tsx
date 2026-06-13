@@ -4,6 +4,7 @@ import { useState } from "react";
 import { FeatureWish } from "@/types";
 import { ThumbsUp, ThumbsDown, CalendarDays, CheckCircle2, ShieldCheck, X, Check, Loader2 } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useT } from "@/context/LanguageContext";
 
 interface WishCardProps {
   wish: FeatureWish;
@@ -21,6 +22,7 @@ function formatDate(ts: number) {
 
 export function WishCard({ wish, onVote, onSolve, userVote = 0, rank }: WishCardProps) {
   const { isAdmin } = useAdmin();
+  const t = useT();
   const [solveOpen, setSolveOpen] = useState(false);
   const [solutionText, setSolutionText] = useState("");
   const [saving, setSaving] = useState(false);
@@ -59,7 +61,7 @@ export function WishCard({ wish, onVote, onSolve, userVote = 0, rank }: WishCard
             </h3>
             {wish.solved && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800 flex-shrink-0">
-                <CheckCircle2 className="w-3 h-3" /> Implemented
+                <CheckCircle2 className="w-3 h-3" /> {t("implemented")}
               </span>
             )}
           </div>
@@ -71,7 +73,7 @@ export function WishCard({ wish, onVote, onSolve, userVote = 0, rank }: WishCard
           {/* Solution text */}
           {wish.solved && wish.solutionText && (
             <div className="mt-3 p-3 bg-green-100 rounded-lg border border-green-200">
-              <p className="text-xs font-bold text-green-700 uppercase tracking-wider mb-1">How it was implemented</p>
+              <p className="text-xs font-bold text-green-700 uppercase tracking-wider mb-1">{t("howImplemented")}</p>
               <p className="text-sm text-green-900 leading-relaxed">{wish.solutionText}</p>
             </div>
           )}
@@ -88,7 +90,7 @@ export function WishCard({ wish, onVote, onSolve, userVote = 0, rank }: WishCard
                 onClick={() => setSolveOpen(true)}
                 className="ml-auto flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold bg-amber-100 text-amber-800 hover:bg-amber-200 transition-colors"
               >
-                <ShieldCheck className="w-3 h-3" /> Mark Implemented
+                <ShieldCheck className="w-3 h-3" /> {t("markImplemented")}
               </button>
             )}
           </div>
@@ -97,7 +99,7 @@ export function WishCard({ wish, onVote, onSolve, userVote = 0, rank }: WishCard
           {solveOpen && (
             <form onSubmit={handleSolve} className="mt-3 p-3 bg-amber-50 rounded-lg border border-amber-200 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-amber-800 uppercase tracking-wider">Implementation Note</span>
+                <span className="text-xs font-bold text-amber-800 uppercase tracking-wider">{t("implementationNote")}</span>
                 <button type="button" onClick={() => setSolveOpen(false)} className="text-gray-400 hover:text-gray-600">
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -108,18 +110,18 @@ export function WishCard({ wish, onVote, onSolve, userVote = 0, rank }: WishCard
                 rows={2}
                 value={solutionText}
                 onChange={(e) => setSolutionText(e.target.value)}
-                placeholder="Describe how this was implemented…"
+                placeholder={t("describeImplementation")}
                 className="w-full rounded-lg border border-amber-300 px-3 py-2 text-sm bg-white outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all resize-none"
               />
               <div className="flex gap-2">
                 <button type="button" onClick={() => setSolveOpen(false)}
                   className="flex-1 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <button type="submit" disabled={saving || !solutionText.trim()}
                   className="flex-1 py-1.5 text-xs font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-1">
                   {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
-                  {saving ? "Saving…" : "Confirm"}
+                  {saving ? t("saving") : t("confirm")}
                 </button>
               </div>
             </form>

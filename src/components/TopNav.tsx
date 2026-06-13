@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Leaf, User, Pencil, Check, ShieldCheck, ShieldOff, LogIn, X } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useLanguage, useT } from "@/context/LanguageContext";
 import { useState } from "react";
 
 function getInitials(name: string) {
@@ -19,6 +20,8 @@ function getInitials(name: string) {
 export function TopNav() {
   const { username, setUsername, isLoaded } = useUser();
   const { isAdmin, login, logout } = useAdmin();
+  const { lang, toggleLang } = useLanguage();
+  const t = useT();
 
   // Name modal
   const [nameOpen, setNameOpen] = useState(false);
@@ -60,17 +63,31 @@ export function TopNav() {
 
             {/* Tagline – desktop only */}
             <p className="hidden lg:block text-green-300 text-sm font-medium italic">
-              Smart. Resilient. Climate-Neutral.
+              {t("tagline")}
             </p>
 
             {/* Right actions */}
             {isLoaded && (
               <div className="flex items-center gap-2">
+                {/* Language toggle */}
+                <button
+                  onClick={toggleLang}
+                  title={lang === "en" ? "Switch to German" : "Auf Englisch wechseln"}
+                  className="flex items-center rounded-xl overflow-hidden border border-green-600 text-xs font-bold select-none"
+                >
+                  <span className={`px-2.5 py-1.5 transition-colors ${lang === "en" ? "bg-green-500 text-white" : "text-green-400 hover:bg-green-800"}`}>
+                    EN
+                  </span>
+                  <span className={`px-2.5 py-1.5 transition-colors ${lang === "de" ? "bg-green-500 text-white" : "text-green-400 hover:bg-green-800"}`}>
+                    DE
+                  </span>
+                </button>
+
                 {/* Admin button */}
                 {isAdmin ? (
                   <button
                     onClick={logout}
-                    title="Logout as Admin"
+                    title={t("logoutAsAdmin")}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 transition-colors"
                   >
                     <ShieldCheck className="w-4 h-4 text-white" />
@@ -80,7 +97,7 @@ export function TopNav() {
                 ) : (
                   <button
                     onClick={openAdminModal}
-                    title="Admin Login"
+                    title={t("adminLoginTooltip")}
                     className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-green-800 hover:bg-green-700 transition-colors"
                   >
                     <ShieldCheck className="w-4 h-4 text-green-400" />
@@ -91,7 +108,7 @@ export function TopNav() {
                 <button
                   onClick={openNameModal}
                   className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-green-800 hover:bg-green-700 transition-colors group"
-                  title="Edit your name"
+                  title={t("editYourName")}
                 >
                   {username ? (
                     <>
@@ -107,7 +124,7 @@ export function TopNav() {
                       <div className="w-7 h-7 rounded-full bg-green-600 border-2 border-dashed border-green-400 flex items-center justify-center">
                         <User className="w-4 h-4 text-green-300" />
                       </div>
-                      <span className="text-green-300 text-sm hidden sm:block">Set your name</span>
+                      <span className="text-green-300 text-sm hidden sm:block">{t("setYourName")}</span>
                     </>
                   )}
                   <Pencil className="w-3.5 h-3.5 text-green-400 group-hover:text-green-200 transition-colors" />
@@ -126,7 +143,7 @@ export function TopNav() {
         >
           <div className="bg-white rounded-2xl shadow-2xl p-5 w-72 mt-2">
             <h3 className="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wider">
-              Your Display Name
+              {t("yourDisplayName")}
             </h3>
             <input
               autoFocus
@@ -134,18 +151,18 @@ export function TopNav() {
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") saveName(); if (e.key === "Escape") setNameOpen(false); }}
-              placeholder="e.g. Maria Muster"
+              placeholder={t("namePlaceholder")}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all"
             />
             <p className="text-xs text-gray-400 mt-1.5">
-              This name will be attached to your ideas automatically.
+              {t("nameWillBeAttached")}
             </p>
             <div className="flex gap-2 mt-4">
               <button
                 onClick={() => setNameOpen(false)}
                 className="flex-1 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button
                 onClick={saveName}
@@ -153,7 +170,7 @@ export function TopNav() {
                 className="flex-1 py-2 text-sm font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-40 transition-colors flex items-center justify-center gap-1.5"
               >
                 <Check className="w-4 h-4" />
-                Save
+                {t("save")}
               </button>
             </div>
           </div>
@@ -170,7 +187,7 @@ export function TopNav() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-amber-600" />
-                <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Admin Login</h3>
+                <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">{t("adminLoginTitle")}</h3>
               </div>
               <button onClick={() => setAdminOpen(false)} className="text-gray-400 hover:text-gray-600">
                 <X className="w-4 h-4" />
@@ -182,7 +199,7 @@ export function TopNav() {
                 type="text"
                 value={adminUser}
                 onChange={(e) => { setAdminUser(e.target.value); setLoginError(false); }}
-                placeholder="Username"
+                placeholder={t("usernameLabel")}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
               />
               <input
@@ -190,11 +207,11 @@ export function TopNav() {
                 value={adminPass}
                 onChange={(e) => { setAdminPass(e.target.value); setLoginError(false); }}
                 onKeyDown={(e) => { if (e.key === "Enter") handleAdminLogin(); }}
-                placeholder="Password"
+                placeholder={t("passwordLabel")}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
               />
               {loginError && (
-                <p className="text-xs text-red-500 font-medium">Invalid username or password.</p>
+                <p className="text-xs text-red-500 font-medium">{t("invalidCredentials")}</p>
               )}
             </div>
             <button
@@ -202,7 +219,7 @@ export function TopNav() {
               className="mt-4 w-full py-2 text-sm font-semibold text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors flex items-center justify-center gap-1.5"
             >
               <LogIn className="w-4 h-4" />
-              Login
+              {t("login")}
             </button>
           </div>
         </div>
