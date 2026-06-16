@@ -39,6 +39,7 @@ export function useData() {
           title: raw.title,
           subtitle: raw.subtitle,
           creator: raw.creator,
+          creatorId: raw.creatorId,
           category: raw.category,
           costs: raw.costs,
           rating: raw.rating,
@@ -65,6 +66,7 @@ export function useData() {
   const addIdea = async (idea: Omit<Idea, "id" | "rating" | "solved" | "createdAt">) => {
     await addDoc(collection(db, "ideas"), {
       ...idea,
+      creatorId: getUserId(),
       rating: 0,
       solved: false,
       votes: {},

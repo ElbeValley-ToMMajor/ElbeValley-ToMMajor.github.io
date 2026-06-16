@@ -1,8 +1,9 @@
 "use client";
 
-import { LayoutGrid, Trophy, CheckCircle2, Clock, Tag, Lightbulb } from "lucide-react";
+import { LayoutGrid, Trophy, CheckCircle2, Clock, Tag, Lightbulb, Star } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useT } from "@/context/LanguageContext";
+import { useUser } from "@/hooks/useUser";
 
 interface LeftSidebarProps {
   categories: string[];
@@ -23,6 +24,7 @@ export function LeftSidebar({
 }: LeftSidebarProps) {
   const pathname = usePathname();
   const t = useT();
+  const { isLoaded: userLoaded } = useUser();
 
   const baseBtn =
     "w-full group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg transition-all";
@@ -47,6 +49,21 @@ export function LeftSidebar({
                 {t("top10Votes")}
               </span>
             </button>
+
+            {userLoaded && (
+              <button
+                onClick={() => onFilterChange("my")}
+                className={`${baseBtn} ${activeFilter === "my" && pathname === "/" ? "bg-indigo-600 text-white shadow-sm" : inactiveBtn}`}
+              >
+                <span className="flex items-center gap-2.5">
+                  <Star className={`w-4 h-4 ${activeFilter === "my" && pathname === "/" ? "text-indigo-200" : "text-gray-400 group-hover:text-green-600"}`} />
+                  {t("myIdeas")}
+                </span>
+                <span className={`text-xs rounded-full px-1.5 py-0.5 font-semibold ${activeFilter === "my" && pathname === "/" ? "bg-indigo-500 text-white" : "bg-gray-100 text-gray-500"}`}>
+                  {ideaCounts["my"] ?? 0}
+                </span>
+              </button>
+            )}
 
             <button
               onClick={() => onFilterChange("started")}

@@ -14,6 +14,7 @@ export interface Idea {
   title: string;
   subtitle: string;
   creator: string;
+  creatorId?: string;
   category: string;
   costs?: string;
   rating: number;

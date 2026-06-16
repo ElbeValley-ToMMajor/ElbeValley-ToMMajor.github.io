@@ -7,7 +7,7 @@ import { useUser } from "@/hooks/useUser";
 import { useT } from "@/context/LanguageContext";
 
 interface IdeaFormProps {
-  onSubmit: (idea: Omit<Idea, "id" | "rating" | "solved" | "createdAt">) => void;
+  onSubmit: (idea: Omit<Idea, "id" | "rating" | "solved" | "createdAt">) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -37,11 +37,11 @@ export function IdeaForm({ onSubmit, onCancel }: IdeaFormProps) {
     if (!isNaN(num)) setCosts(num.toLocaleString("de-DE"));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const finalCategory = category === "Other" ? customCategory.trim() || "Other" : category;
     if (!title || !subtitle || !creator || !finalCategory) return;
-    onSubmit({ title, subtitle, creator, category: finalCategory, costs: costs || undefined });
+    await onSubmit({ title, subtitle, creator, category: finalCategory, costs: costs || undefined });
   };
 
   return (

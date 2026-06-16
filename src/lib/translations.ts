@@ -22,6 +22,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     // LeftSidebar
     discover: "Discover",
     top10Votes: "Top 10 Votes",
+    myIdeas: "My Ideas",
     startedIdeas: "Started Ideas",
     solvedIdeas: "Solved Ideas",
     featureWishes: "Feature Wishes",
@@ -109,6 +110,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     // page.tsx headings & UI
     top10IdeasHeading: "Top 10 Ideas",
     allIdeasHeading: "All Ideas",
+    myIdeasHeading: "My Ideas",
     startedIdeasHeading: "Started Ideas",
     solvedIdeasHeading: "Solved Ideas",
     ideaSingular: "idea",
@@ -123,9 +125,11 @@ export const translations: Record<Lang, Record<string, string>> = {
     noIdeasFilter: "No ideas found for this filter.",
     ideaSubmitted: "Idea submitted!",
     top10Chip: "Top 10",
+    myIdeasChip: "My Ideas",
     startedChip: "Started",
     solvedChip: "Solved",
     featureWishesChip: "Feature Wishes",
+    noMyIdeas: "You haven't submitted any ideas yet.",
   },
 
   de: {
@@ -149,6 +153,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     // LeftSidebar
     discover: "Entdecken",
     top10Votes: "Top 10 Votes",
+    myIdeas: "Meine Ideen",
     startedIdeas: "Gestartete Ideen",
     solvedIdeas: "Gelöste Ideen",
     featureWishes: "Funktionswünsche",
@@ -236,6 +241,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     // page.tsx headings & UI
     top10IdeasHeading: "Top 10 Ideen",
     allIdeasHeading: "Alle Ideen",
+    myIdeasHeading: "Meine Ideen",
     startedIdeasHeading: "Gestartete Ideen",
     solvedIdeasHeading: "Gelöste Ideen",
     ideaSingular: "Idee",
@@ -250,8 +256,10 @@ export const translations: Record<Lang, Record<string, string>> = {
     noIdeasFilter: "Keine Ideen für diesen Filter.",
     ideaSubmitted: "Idee eingereicht!",
     top10Chip: "Top 10",
+    myIdeasChip: "Meine Ideen",
     startedChip: "Gestartet",
     solvedChip: "Gelöst",
     featureWishesChip: "Funktionswünsche",
+    noMyIdeas: "Du hast noch keine Ideen eingereicht.",
   },
 };

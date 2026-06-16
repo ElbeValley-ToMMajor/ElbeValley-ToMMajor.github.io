@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useData } from "@/hooks/useData";
+import { useUser } from "@/hooks/useUser";
 import { useToast } from "@/context/ToastContext";
 import { useT } from "@/context/LanguageContext";
 import { IdeaCard } from "@/components/IdeaCard";
@@ -13,12 +14,13 @@ import { IdeaForm } from "@/components/IdeaForm";
 import { Idea } from "@/types";
 import {
   Plus, LayoutGrid, Trophy, CheckCircle2, Clock,
-  Tag, Lightbulb, Search, ArrowDownUp, X,
+  Tag, Lightbulb, Search, ArrowDownUp, X, Star,
 } from "lucide-react";
 
 // Inner component that uses useSearchParams (must be inside Suspense)
 function IdeaFindingPageInner() {
   const { ideas, addIdea, voteIdea, solveIdea, setInProgress, deleteIdea, userVotes, isLoaded } = useData();
+  const { userId } = useUser();
   const { toast } = useToast();
   const t = useT();
   const searchParams = useSearchParams();
@@ -52,14 +54,15 @@ function IdeaFindingPageInner() {
   const categories = useMemo(() => Array.from(new Set(ideas.map((i) => i.category))), [ideas]);
 
   const ideaCounts = useMemo(() => {
-    const counts: Record<string, number> = { solved: 0, started: 0 };
+    const counts: Record<string, number> = { solved: 0, started: 0, my: 0 };
     for (const idea of ideas) {
       counts[idea.category] = (counts[idea.category] ?? 0) + 1;
       if (idea.solved) counts["solved"]++;
       if (idea.inProgress && !idea.solved) counts["started"]++;
+      if (userId && idea.creatorId === userId) counts["my"]++;
     }
     return counts;
-  }, [ideas]);
+  }, [ideas, userId]);
 
   const filteredIdeas = useMemo(() => {
     let result = [...ideas];
@@ -68,6 +71,8 @@ function IdeaFindingPageInner() {
     if (activeFilter === "top10") {
       result.sort((a, b) => b.rating - a.rating);
       result = result.slice(0, 10);
+    } else if (activeFilter === "my") {
+      result = result.filter((i) => userId && i.creatorId === userId);
     } else if (activeFilter === "solved") {
       result = result.filter((i) => i.solved);
     } else if (activeFilter === "started") {
@@ -101,6 +106,7 @@ function IdeaFindingPageInner() {
 
   const headingLabel =
     activeFilter === "top10"   ? t("top10IdeasHeading") :
+    activeFilter === "my"      ? t("myIdeasHeading") :
     activeFilter === "solved"  ? t("solvedIdeasHeading") :
     activeFilter === "started" ? t("startedIdeasHeading") :
     activeFilter === "all"     ? t("allIdeasHeading") :
@@ -139,6 +145,7 @@ function IdeaFindingPageInner() {
           {[
             { key: "all",     label: t("allIdeas"),        icon: <LayoutGrid className="w-3.5 h-3.5" /> },
             { key: "top10",   label: t("top10Chip"),        icon: <Trophy className="w-3.5 h-3.5" /> },
+            { key: "my",      label: t("myIdeasChip"),      icon: <Star className="w-3.5 h-3.5" /> },
             { key: "started", label: t("startedChip"),      icon: <Clock className="w-3.5 h-3.5" /> },
             { key: "solved",  label: t("solvedChip"),       icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
             ...categories.map((c) => ({ key: c, label: c, icon: <Tag className="w-3.5 h-3.5" /> })),
@@ -220,7 +227,11 @@ function IdeaFindingPageInner() {
           {filteredIdeas.length === 0 ? (
             <div className="bg-white rounded-xl border border-green-100 p-12 text-center">
               <p className="text-gray-400 font-medium">
-                {search ? `${t("noIdeasMatching")} "${search}".` : t("noIdeasFilter")}
+                {search
+                  ? `${t("noIdeasMatching")} "${search}".`
+                  : activeFilter === "my"
+                  ? t("noMyIdeas")
+                  : t("noIdeasFilter")}
               </p>
             </div>
           ) : (
@@ -257,8 +268,8 @@ function IdeaFindingPageInner() {
       {/* New idea form modal */}
       {isFormOpen && (
         <IdeaForm
-          onSubmit={(ideaData) => {
-            addIdea(ideaData);
+          onSubmit={async (ideaData) => {
+            await addIdea(ideaData);
             setIsFormOpen(false);
             toast(t("ideaSubmitted"), "success");
           }}
